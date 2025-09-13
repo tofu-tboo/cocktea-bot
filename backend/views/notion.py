@@ -43,34 +43,34 @@ def update_stock(request):
 
     data = json.loads(request.body)
     payloads = {
-                "table_row": {
-                    "cells": [
-                        [
-                            {
-                                "type": "text",
-                                "text": {
-                                    "content": data.get("content")
-                                }
-                            }
-                        ],
-                        [
-                            {
-                                "type": "text",
-                                "text": {
-                                    "content": data.get("content")
-                                }
-                            }
-                        ],
-                        [
-                            {
-                                "type": "text",
-                                "text": {
-                                    "content": data.get("content")
-                                }
-                            }
-                        ]
-                    ]
-                }
+        "table_row": {
+            "cells": [
+                [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": data.get("content")
+                        }
+                    }
+                ],
+                [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": data.get("content")
+                        }
+                    }
+                ],
+                [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": data.get("content")
+                        }
+                    }
+                ]
+            ]
+        }
     }
 
     try:

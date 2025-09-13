@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from api.views import signup, login, logout, delete_account, status, notion_test, update_stock
+from backend.views import signup, login, logout, delete_account, status, notion_test, update_stock
 
 urlpatterns = [
     path('admin/', admin.site.urls),
