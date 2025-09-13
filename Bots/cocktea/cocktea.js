@@ -3,35 +3,86 @@ const bot = BotManager.getCurrentBot();
 var Jsoup = org.jsoup.Jsoup;
 var Method = org.jsoup.Connection.Method;
 
-function onCommand(msg) {
-  const { content, author, reply, command, args } = msg;
+function onMessage(msg) {
+  const { content, author, reply } = msg;
   const sender = author.name;
 
-  if (content.startsWith("!") && content.length > 1) {
-    var conn = org.jsoup.Jsoup.connect(
-      "https://cocktea-q9gfln6cj-dgist2023choidoyuns-projects.vercel.app/api/update-stock/"
-    )
-      .ignoreContentType(true)
-      .timeout(10000)
-      .header("Content-Type", "application/json");
+  if (!content.startsWith("!") && content.length <= 1) {
+    // 명령어가 아니거나 단순 느낌표면 무시
+    return;
+  }
 
-    var res = conn
-      .method(org.jsoup.Connection.Method.PATCH)
-      .requestBody(JSON.stringify({ content: content.slice(1) }))
-      .execute();
+  var command = content.trim().split(" ")[0].slice(1).toLowerCase().trim();
+  const recipe_commands = ["레시피", "recipe", "r"];
+  const use_commands = ["사용", "use", "u"];
 
-    var code = res.statusCode();
-    // 서버 정책에 맞춰 성공 코드 범위 조정 (200/201/204 등)
-    if (code >= 200 && code < 300) {
-      reply(
-        sender +
-          "님, 노션 수정 요청이 처리되었습니다.\n확인요망: https://www.notion.so/26c968085ab980369fcfff8902d3927e"
-      );
-    } else {
-      reply("요청 실패(code: " + code + ")\n" + res.body());
-    }
+  if (!recipe_commands.includes(command) && !use_commands.includes(command)) {
+    command = content.trim().split("\n")[0].slice(1).toLowerCase().trim();
+  }
+
+  switch (command) {
+    case recipe_commands[0]:
+    case recipe_commands[1]:
+    case recipe_commands[2]:
+      {
+        var res = sendReq("recipe", "GET");
+        if (res.succeed) {
+          botReply(reply, res.body());
+        }
+      }
+      break;
+    case use_commands[0]:
+    case use_commands[1]:
+    case use_commands[2]:
+      {
+        var data = content
+          .trim()
+          .slice(command.length + 1)
+          .trim();
+        var res = sendReq("update-stock", "PATCH", data);
+
+        if (res.succeed) {
+          botReply(reply, "업데이트 완료.");
+        }
+      }
+      break;
   }
 }
 
-bot.setCommandPrefix("!");
-bot.addListener(Event.COMMAND, onCommand);
+bot.addListener(Event.MESSAGE, onMessage);
+
+function botReply(reply, content) {
+  reply("[봇] " + content);
+}
+
+function sendReq(url, method_string, data) {
+  var conn = org.jsoup.Jsoup.connect(
+    "https://cocktea-q9gfln6cj-dgist2023choidoyuns-projects.vercel.app/api/" +
+      url +
+      "/"
+  )
+    .ignoreContentType(true)
+    .timeout(10000)
+    .header("Content-Type", "application/json");
+  const method = {
+    GET: org.jsoup.Connection.Method.GET,
+    POST: org.jsoup.Connection.Method.POST,
+    PATCH: org.jsoup.Connection.Method.PATCH,
+    DELETE: org.jsoup.Connection.Method.DELETE,
+  }[method_string];
+
+  var res;
+  if (method_string == "GET" || method_string == "DELETE") {
+    res = conn.method(method).execute();
+  } else {
+    res = conn
+      .method(method)
+      .requestBody(JSON.stringify({ content: data }))
+      .execute();
+  }
+  return {
+    status: res.statusCode(),
+    body: res.body(),
+    succeed: res.statusCode() >= 200 && res.statusCode() < 300,
+  };
+}
