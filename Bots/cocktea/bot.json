@@ -1,0 +1,10 @@
+{
+    "main": "cocktea.js",
+    "option": {
+        "apiLevel": 2,
+        "useUnifiedParams": true,
+        "useBabel": false,
+        "backupDBOnDelete": true,
+        "scriptPower": true
+    }
+}
