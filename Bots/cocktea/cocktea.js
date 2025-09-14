@@ -2,6 +2,7 @@ const bot = BotManager.getCurrentBot();
 
 var Jsoup = org.jsoup.Jsoup;
 var Method = org.jsoup.Connection.Method;
+var JSONObject = org.json.JSONObject;
 
 function onMessage(msg) {
   const { content, author, reply } = msg;
@@ -25,9 +26,24 @@ function onMessage(msg) {
     case recipe_commands[1]:
     case recipe_commands[2]:
       {
-        var res = sendReq("recipe", "GET");
+        var cocktail_name = content
+          .trim()
+          .slice(command.length + 1)
+          .trim();
+        var res = sendReq("recipe/" + cocktail_name, "GET");
+        var json = new JSONObject(res.body());
         if (res.succeed) {
-          botReply(reply, res.body());
+          botReply(
+            reply,
+            "\n" +
+              json.getString("ingredients") +
+              "\n" +
+              json.getString("recipe")
+          );
+        } else {
+          var message = json.getString("message");
+
+          botReply(reply, message);
         }
       }
       break;

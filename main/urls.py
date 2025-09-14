@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from backend.views import signup, login, logout, delete_account, status, update_stock
+from backend.views import signup, login, logout, delete_account, status, update_stock, get_recipe
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -10,5 +10,6 @@ urlpatterns = [
     # path("api/delete/", delete_account),
     path("", status),
     path("api/", status),
-    path("api/update-stock/", update_stock)
+    path("api/update-stock/", update_stock),
+    path("api/recipe/<path:cocktail_name>/", get_recipe)
 ]

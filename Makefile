@@ -23,7 +23,7 @@ venv:
 	$(PIP) -q install -U pip
 
 install-all: venv
-	$(PIP) install -q django requests python-dotenv whitenoise
+	$(PIP) install -q django requests python-dotenv whitenoise pydantic
 
 request:
 	curl -X $(method) -H "Content-Type: application/json" -d '$(data)' http://localhost:$(PORT)/api/$(where)/
