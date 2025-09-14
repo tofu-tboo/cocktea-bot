@@ -2,7 +2,6 @@ const bot = BotManager.getCurrentBot();
 
 var Jsoup = org.jsoup.Jsoup;
 var Method = org.jsoup.Connection.Method;
-var JSONObject = org.json.JSONObject;
 
 function onMessage(msg) {
   const { content, author, reply } = msg;
@@ -31,17 +30,19 @@ function onMessage(msg) {
           .slice(command.length + 1)
           .trim();
         var res = sendReq("recipe/" + cocktail_name, "GET");
-        var json = new JSONObject(res.body());
+        var json = JSON.parse(res.body);
         if (res.succeed) {
           botReply(
             reply,
-            "\n" +
-              json.getString("ingredients") +
+            json.cocktail_name +
+              " 레시피" +
               "\n" +
-              json.getString("recipe")
+              json.ingredients +
+              "\n\n" +
+              json.recipe
           );
         } else {
-          var message = json.getString("message");
+          var message = json.message;
 
           botReply(reply, message);
         }
@@ -73,11 +74,10 @@ function botReply(reply, content) {
 
 function sendReq(url, method_string, data) {
   var conn = org.jsoup.Jsoup.connect(
-    "https://cocktea-q9gfln6cj-dgist2023choidoyuns-projects.vercel.app/api/" +
-      url +
-      "/"
+    "https://cocktea-bot.vercel.app/api/" + url + "/"
   )
     .ignoreContentType(true)
+    .ignoreHttpErrors(true)
     .timeout(10000)
     .header("Content-Type", "application/json");
   const method = {

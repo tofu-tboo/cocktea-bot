@@ -11,5 +11,5 @@ urlpatterns = [
     path("", status),
     path("api/", status),
     path("api/update-stock/", update_stock),
-    path("api/recipe/<path:cocktail_name>/", get_recipe)
+    path("api/recipe/<str:cocktail_name>/", get_recipe)
 ]
