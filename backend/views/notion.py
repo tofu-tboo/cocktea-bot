@@ -137,7 +137,7 @@ def update_stock(request):
             update_content[column_label["개수"]] = {
                 "type": "text",
                 "text": {
-                    "content": str(name_map[name]["count"]) if min_usage > 0 else str(name_map[name]["count"] - len(data.filter(lambda x: x == 0)))
+                    "content": str(name_map[name]["count"]) if min_usage > 0 else str(name_map[name]["count"] - len([datum for datum in data if datum == 0]))
                 }
             }
             update_content[column_label["대치어"]] = {
