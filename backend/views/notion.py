@@ -116,12 +116,19 @@ def update_stock(request):
         4. 업데이트 내용이 기존 내용보다 작으면 업데이트 수행.
         5. 업데이트 내용이 0이면 개수 -1.
         '''
-        print(usages_map)
+
+        harsh_stocks = []
         for name, data in usages_map.items():
             max_usage = max(data)
             min_usage = min(data)
             url = f"{base_url}/blocks/{name_map[name]["id"]}"
             update_content = [{}, {}, {}, {}]
+
+            new_remain = max_usage
+            new_count = name_map[name]["count"] if min_usage > 0 else name_map[name]["count"] - len([datum for datum in data if datum == 0])
+            if new_count == 0 or (new_count == 1 and new_remain <= 5):
+                harsh_stocks.append(name)
+
             update_content[column_label["품명"]] = {
                 "type": "text",
                 "text": {
@@ -131,13 +138,13 @@ def update_stock(request):
             update_content[column_label["잔여 용량"]] = {
                 "type": "text",
                 "text": {
-                    "content": str(max_usage)
+                    "content": str(new_remain)
                 }
             }
             update_content[column_label["개수"]] = {
                 "type": "text",
                 "text": {
-                    "content": str(name_map[name]["count"]) if min_usage > 0 else str(name_map[name]["count"] - len([datum for datum in data if datum == 0]))
+                    "content": str(new_count)
                 }
             }
             update_content[column_label["대치어"]] = {
@@ -166,7 +173,12 @@ def update_stock(request):
             }
 
             request_with_retry(url, "PATCH", headers=headers, payload=payload)
-        return JsonResponse({"message": "업데이트 완료."}, status=200)
+        res_json = {
+            "message": "업데이트 완료."
+        }
+        if len(harsh_stocks) > 0:
+            res_json["admin_message"] = "다음 품목의 재고가 부족합니다: " + ", ".join(harsh_stocks)
+        return JsonResponse(res_json, status=200)
     except ApiError as e:
         if type(e.error_code) is ErrorCode:
             return error_resp(e.error_code)

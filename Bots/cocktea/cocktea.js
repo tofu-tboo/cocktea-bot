@@ -61,6 +61,9 @@ function onMessage(msg) {
 
         if (res.succeed) {
           botReply(reply, "업데이트 완료.");
+          if (res.admin_message) {
+            botReply(reply, res.admin_message);
+          }
         } else {
           var message = json.message;
 
