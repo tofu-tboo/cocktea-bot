@@ -57,9 +57,14 @@ function onMessage(msg) {
           .slice(command.length + 1)
           .trim();
         var res = sendReq("update-stock", "PATCH", data);
+        var json = JSON.parse(res.body);
 
         if (res.succeed) {
           botReply(reply, "업데이트 완료.");
+        } else {
+          var message = json.message;
+
+          botReply(reply, message);
         }
       }
       break;
