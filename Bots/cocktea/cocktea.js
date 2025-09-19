@@ -7,7 +7,7 @@ function onMessage(msg) {
   const { content, author, reply } = msg;
   const sender = author.name;
 
-  if (!content.startsWith("!") && content.length <= 1) {
+  if (!content.startsWith("!") || content.length <= 2) {
     // 명령어가 아니거나 단순 느낌표면 무시
     return;
   }
